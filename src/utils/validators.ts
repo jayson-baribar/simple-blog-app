@@ -11,12 +11,13 @@ const isTooShort = (value: string, minLength: number): boolean => {
 
 // max character checker ( num )
 const isTooLong = (value: string, maxLength: number): boolean => {
-    return value.trim().length < maxLength;
+    return value.trim().length > maxLength;
 }
 
 // password validation
 const isPasswordValid = ( password: string ): boolean => {
-    if (isBlank(password), isTooShort(password, 8) || isTooLong(password, 16)){
+    if (isBlank(password) || isTooShort(password, 8) 
+        || isTooLong(password, 16)){
         return false;
     }
 
