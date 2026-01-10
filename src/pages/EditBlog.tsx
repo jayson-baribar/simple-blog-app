@@ -1,41 +1,57 @@
 import { useState, useEffect } from "react";
 import Page from "../components/layout/Page";
+import { getBlogs, updateBlog, deleteBlog } from "../services/blogService";
+import utils from "../utils/validators"
 
 
-const EditBlog = () => {
+type Props = {
+    blogId: string;
+    onClose: ()=> void;
+    onSuccess: ()=> void;
+};
 
+const EditBlog = ({ blogId, onClose, onSuccess } : Props ) => {
     const [title, setTitle]= useState("");
     const [content, setContent] = useState("");
 
-    useEffect( ()=>{
+    useEffect(() => {
 
-        const existingBlog ={
-            title: "My first blog",
-            content: "Content of the blog"
-        };
+        const load = async ()=> {
+            const blogs = await getBlogs();
+            const blog = blogs.find((b: any) => b.id === blogId);
+        
+        
+        if (!blog){
+            alert("Blog not found")
+            return;
+        }
 
-        setTitle(existingBlog.title);
-        setContent(existingBlog.content);
-    }, []);
+        setTitle(blog.title);
+        setContent(blog.content);
+
+        // alert("Blog successfully edited.")
+    }
+    load();
+    }, [blogId]);
 
     
-    const handleSubmit = (e:React.FormEvent)=>{
-
-        e.preventDefault();
-
-        if (!title || !content){
-            alert(" Title and content are required. ")
-            return;
-        }   
-
-        console.log("Blog updated!: ", {
-            title,
-            content
-        });
-
-        alert ("Blog successfully updated!")
+    const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    
+    if (utils.isBlank(title) || utils.isBlank(content)) {
+        alert("Title and content are required.");
+        return;
     }
 
+    try {
+        await updateBlog( blogId, title, content );
+        onSuccess();
+        onClose();
+        alert("Blog updated!");
+    } catch (err: any) {
+        alert(err.message);
+    }
+    };
 
     return (
 
@@ -49,22 +65,21 @@ const EditBlog = () => {
                 <input 
                 type = "text"
                 value = {title}
-                onChange={(e) => setTitle(e.target.value)}
-                placeholder="Enter your story title"
-          />
+                onChange={(e) => setTitle(e.target.value)}          />
             </div>
 
             <div>
                 <label> Content </label>
                     <textarea
                     value = {content}
-                    placeholder="Write your story here "
                     onChange={(e) => setContent(e.target.value)}
                     />
                 
             </div>
 
-            <button type = "submit" > Publish </button>
+            <button type = "submit" > Save changes </button>
+            <button type = "button" onClick={close}> Cancel </button>
+             
         </form>
         </Page>
     )

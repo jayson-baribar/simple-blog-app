@@ -1,23 +1,23 @@
 import Page from "../components/layout/Page";
 import { useState } from "react";
 import utils from "../utils/validators";
+import { supabase } from "../lib/supabase";
 
 const Register = () => {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
 
   const usernameMin = 6;
-  const usernameMax = 20;
+  const usernameMax = 64;
 
   const passwordMin = 8;
   const passwordMax = 16;
 
-  const handleRegister = (e: React.FormEvent) => {
-
+  const handleRegister = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    if (utils.isBlank(username)) {
-      alert("Username is required.");
+    if (utils.isBlank(username) || utils.isBlank(password)) {
+      alert("Username and password are required.");
       return;
     }
 
@@ -37,8 +37,17 @@ const Register = () => {
       return;
     }
 
-    console.log("User registered:", { username, password });
-    alert("Validation passed! Ready for Supabase integration.");
+    const { error } = await supabase.auth.signUp({
+      email: username,
+      password: password
+    });
+
+    if (error) {
+      alert(error.message);
+    } else {
+      alert("Registration successful! You can now log in.");
+      window.location.href = "login";
+    }
   };
 
   return (
@@ -47,16 +56,17 @@ const Register = () => {
 
       <form onSubmit={handleRegister}>
         <div>
-          <label>Username:</label>
+          <label>Username</label>
           <input
             type="text"
             value={username}
             onChange={(e) => setUsername(e.target.value)}
+            placeholder=" email"
           />
         </div>
 
         <div>
-          <label>Password:</label>
+          <label>Password</label>
           <input
             type="password"
             value={password}

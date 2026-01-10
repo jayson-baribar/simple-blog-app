@@ -1,26 +1,61 @@
 import Page from "../components/layout/Page";
 import { useState } from "react";
-import Utils from "../utils/validators";
+import utils from "../utils/validators";
+import { supabase } from "../lib/supabase";
+import { useDispatch } from "react-redux";
+import { setUser } from "../store/authSlice";
 
 const Login = () => {
+
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
+  const dispatch = useDispatch();
 
-  const handleLogin = (e: React.FormEvent) => {
+  const usernameMin = 6;
+  const usernameMax = 64;
+
+  const passwordMin = 8;
+  const passwordMax = 16;
+
+
+  const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    if (Utils.isBlank(username)) {
-      alert("Username is required.");
+    if (utils.isBlank(username) || utils.isBlank(password)) {
+      alert("Username and password are required.");
       return;
     }
 
-    if (!Utils.isPasswordValid(password)) {
-      alert("Password must be 8-16 characters long.");
+    if (
+      utils.isTooShort(username, usernameMin) ||
+      utils.isTooLong(username, usernameMax)
+    ) {
+      alert(`Your username must be ${usernameMin}-${usernameMax} characters.`);
       return;
     }
 
-    console.log("User logged in:", { username, password });
-    alert("Login validation passed!");
+    if (
+      utils.isTooShort(password, passwordMin) ||
+      utils.isTooLong(password, passwordMax)
+    ) {
+      alert(`Your password must be ${passwordMin}-${passwordMax} characters.`);
+      return;
+    }
+
+    const { error } = await supabase.auth.signInWithPassword({
+        email: username,
+        password: password
+    })
+
+    if ( error ){
+        alert(error.message)
+    }
+
+    const { data } = await supabase.auth.getUser();
+    dispatch(setUser(data.user));
+    
+    alert("Login Successful")
+    window.location.href = "/profile";
   };
 
   return (

@@ -1,7 +1,15 @@
+import { useState, useEffect } from "react";
 import Page from "../components/layout/Page";
-import { mockBlogs } from "../data/mockBlogs";
+import { getBlogs } from "../services/blogService";
+
 
 const Blogs = () => {
+
+const [ blogs, setBlogs] = useState<any[]>([]);
+
+useEffect(() => {
+  getBlogs().then(setBlogs).catch(console.error);
+}, []);
 
     return (
 
@@ -22,12 +30,11 @@ const Blogs = () => {
 
             <section>
                 <h2> Latest Stories </h2>
-                {mockBlogs.map((blog)=>(
-                    <article
-                    
-                    key = {blog.id}
+                {blogs.map((blog)=>(
+                    <article key = {blog.id}
+
                     style={{
-                        padding: "1rem 0",
+                        padding: "0rem 0",
                         borderBottom: "1px solid white"
                     }}
                     >
@@ -39,10 +46,11 @@ const Blogs = () => {
                             </address>
                         </h3>
 
-                        <p>{blog.preview}</p>
+                        <p>{blog.content}</p>
                         <small > {blog.createdAt} </small>
-
+                        
                     </article>
+
                 ))}
             </section>
         </Page>

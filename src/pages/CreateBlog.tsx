@@ -1,31 +1,46 @@
 import { useState } from "react";
 import Page from "../components/layout/Page";
+import { createBlog } from "../services/blogService";
+import utils from "../utils/validators";
+import { supabase } from "../lib/supabase";
 
 
-const CreateBlog = () => {
+type Props = {
+  onClose: ()=> void;
+  onSuccess: ()=> void;
+};
+
+const CreateBlog = ( { onClose, onSuccess } : Props ) => {
 
     const [title, setTitle]= useState("");
     const [content, setContent] = useState("");
 
-    const handleSubmit = (e:React.FormEvent)=>{
 
-        e.preventDefault();
+const handleSubmit = async (e: React.FormEvent) => {
+  e.preventDefault();
 
-        if (!title || !content){
-            alert(" Title and content are required. ")
-            return;
-        }   
+  if (utils.isBlank(title) || utils.isBlank(content)) {
+    alert("Title and content are required.");
+    return;
+  }
 
-        console.log("New blog created: ", {
-            title,
-            content
-        });
+  const { data } = await supabase.auth.getUser() ;
+  const user = data.user;
 
-        alert ("Blog successfully created!")
-        setTitle("");
-        setContent("");
-    }
+  if (!user){
+    alert( "You must be logged in ");
+    return;
+  }
 
+  try {
+    await createBlog( title, content, user.email || "Unknown" );
+    alert("Blog created!");
+    onSuccess();
+    onClose();
+  } catch (err: any) {
+    alert(err.message);
+  }
+};
 
     return (
 
