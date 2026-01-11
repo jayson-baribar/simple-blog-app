@@ -79,7 +79,7 @@ const Profile = () => {
                 {blog.title}
               </h3>
 
-              <p className="text-gray-700 mt-2 line-clamp-3 break-words">
+              <p className="text-gray-700 mt-2 break-words">
                 {blog.content}
               </p>
 

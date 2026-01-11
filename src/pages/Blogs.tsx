@@ -59,7 +59,7 @@ const Blogs = () => {
                   </span>
                 </h3>
 
-                <p className="text-gray-700 mt-2 line-clamp-3">
+                <p className="text-gray-700 mt-2">
                   {blog.content}
                 </p>
               </article>
