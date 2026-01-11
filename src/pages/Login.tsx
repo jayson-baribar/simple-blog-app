@@ -5,13 +5,15 @@ import { supabase } from "../lib/supabase";
 import { useDispatch } from "react-redux";
 import { setUser } from "../store/authSlice";
 import { useNavigate } from "react-router-dom";
+import Toast from "../components/Toast";
+
 
 const Login = () => {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
+  const [ toast, setToast ] = useState<{message: string; type?: "success" | "error" } | null> (null);
   const dispatch = useDispatch();
   const navigate = useNavigate();
-
   const usernameMin = 6;
   const usernameMax = 64;
   
@@ -20,6 +22,9 @@ const Login = () => {
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
+
+    
+
 
     if (utils.isBlank(username) || utils.isBlank(password)) {
       alert("Username and password are required.");
@@ -48,17 +53,19 @@ const Login = () => {
     });
 
     if (error) {
-      alert(error.message);
+      setToast({ message: error.message, type: "error" });
       return;
     }
 
     const { data } = await supabase.auth.getUser();
     dispatch(setUser(data.user));
-    alert("Login Successful");
+    setToast({ message: "Login successful!", type: "success" });
     navigate("/profile");
   };
 
   return (
+
+    
     <Page>
       <div className="min-h-screen flex items-center justify-center bg-gray-100">
         <form
@@ -97,6 +104,15 @@ const Login = () => {
           </button>
         </form>
       </div>
+
+      {toast && (
+        <Toast
+          message={toast.message}
+          type={toast.type}
+          onClose={() => setToast(null)}
+        />
+      )}
+
     </Page>
   );
 };

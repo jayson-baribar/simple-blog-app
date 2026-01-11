@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { getBlogs, updateBlog } from "../services/blogService";
 import utils from "../utils/validators";
+import Toast from "../components/Toast";
 
 type Props = {
   blogId: string;
@@ -11,14 +12,17 @@ type Props = {
 const EditBlog = ({ blogId, onClose, onSuccess }: Props) => {
   const [title, setTitle] = useState("");
   const [content, setContent] = useState("");
+  const [ toast, setToast ] = useState<{message: string; type?: "success" | "error"} | null >(null);
 
   useEffect(() => {
     const load = async () => {
       const blogs = await getBlogs();
       const blog = blogs.find((b: any) => b.id === blogId);
+    
 
       if (!blog) {
-        alert("Blog not found");
+        // alert("Blog not found");
+        setToast({message: "Blog not found", type: "error"});
         return;
       }
 
@@ -33,14 +37,16 @@ const EditBlog = ({ blogId, onClose, onSuccess }: Props) => {
     e.preventDefault();
 
     if (utils.isBlank(title) || utils.isBlank(content)) {
-      alert("Title and content are required.");
+      // alert("Title and content are required.");
+      setToast({message: "Title and content are required", type: "error"});
       return;
     }
 
     try {
       await updateBlog(blogId, title, content);
+      setToast({message: "Blog successfully updated"})
       onSuccess();
-      onClose();
+      setTimeout(onClose, 1500);
     } catch (err: any) {
       alert(err.message);
     }
@@ -90,8 +96,19 @@ const EditBlog = ({ blogId, onClose, onSuccess }: Props) => {
             Cancel
           </button>
         </div>
+        
       </form>
+      {toast && (
+        <Toast
+          message={toast.message}
+          type={toast.type}
+          onClose={() => setToast(null)}
+        />
+      )}
+      
     </div>
+
+    
   );
 };
 

@@ -4,6 +4,7 @@ import { getBlogs, deleteBlog } from "../services/blogService";
 import Page from "../components/layout/Page";
 import CreateBlog from "./CreateBlog";
 import EditBlog from "./EditBlog";
+import Toast from "../components/Toast";
 
 const PAGE_SIZE = 5;
 
@@ -13,6 +14,7 @@ const Profile = () => {
   const [showCreate, setShowCreate] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [ deleteId, setDeleteId ] = useState<string | null>(null);
+  const [ toast, setToast ] = useState<{message: string; type?: "success" | "error"} | null>(null);
 
   const [page, setPage] = useState(0);
 
@@ -43,6 +45,8 @@ const Profile = () => {
     if (!deleteId) return;
 
     await deleteBlog(deleteId);
+    setToast({ message: "Blog deleted", type: "success" });
+    
     setDeleteId(null);
     load();
   };
@@ -169,6 +173,15 @@ const Profile = () => {
 )}
 
       </div>
+
+                  {toast && (
+        <Toast
+          message={toast.message}
+          type={toast.type}
+          onClose={() => setToast(null)}
+        />
+      )}
+      
     </Page>
   );
 };

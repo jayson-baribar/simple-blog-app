@@ -2,11 +2,16 @@ import Page from "../components/layout/Page";
 import { useState } from "react";
 import utils from "../utils/validators";
 import { supabase } from "../lib/supabase";
+import Toast  from "../components/Toast";
+import { useNavigate } from "react-router-dom";
 
 const Register = () => {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
+  const [ toast, setToast ] = useState<{message: string; type?: 
+  "success"| "error" } | null> (null);
 
+  const navigate = useNavigate();
   const usernameMin = 6;
   const usernameMax = 64;
   const passwordMin = 8;
@@ -16,7 +21,8 @@ const Register = () => {
     e.preventDefault();
 
     if (utils.isBlank(username) || utils.isBlank(password)) {
-      alert("Username and password are required.");
+      // alert("Username and password are required.");
+      setToast({message: `Username and password are required.`, type: "error"});
       return;
     }
 
@@ -24,7 +30,8 @@ const Register = () => {
       utils.isTooShort(username, usernameMin) ||
       utils.isTooLong(username, usernameMax)
     ) {
-      alert(`Your username must be ${usernameMin}-${usernameMax} characters.`);
+      // alert(`Your username must be ${usernameMin}-${usernameMax} characters.`);
+      setToast({message: `Your username must be ${usernameMin}-${usernameMax} characters.`, type: "error"})
       return;
     }
 
@@ -32,7 +39,8 @@ const Register = () => {
       utils.isTooShort(password, passwordMin) ||
       utils.isTooLong(password, passwordMax)
     ) {
-      alert(`Your password must be ${passwordMin}-${passwordMax} characters.`);
+      // alert(`Your password must be ${passwordMin}-${passwordMax} characters.`);
+      setToast({message: `Your password must be ${passwordMin}-${passwordMax} characters.`, type: "error"})
       return;
     }
 
@@ -44,8 +52,11 @@ const Register = () => {
     if (error) {
       alert(error.message);
     } else {
-      alert("Registration successful! You can now log in.");
-      window.location.href = "login";
+      // alert("Registration successful! You can now log in.");
+      setToast({message: `Registration successful! You can now log in.`})
+      setUsername("");
+      setPassword("");
+
     }
   };
 
@@ -93,6 +104,14 @@ const Register = () => {
           </button>
         </form>
       </div>
+
+            {toast && (
+        <Toast
+          message={toast.message}
+          type={toast.type}
+          onClose={() => setToast(null)}
+        />
+      )}
     </Page>
   );
 };
