@@ -9,7 +9,6 @@ const Register = () => {
 
   const usernameMin = 6;
   const usernameMax = 64;
-
   const passwordMin = 8;
   const passwordMax = 16;
 
@@ -39,7 +38,7 @@ const Register = () => {
 
     const { error } = await supabase.auth.signUp({
       email: username,
-      password: password
+      password: password,
     });
 
     if (error) {
@@ -52,30 +51,48 @@ const Register = () => {
 
   return (
     <Page>
-      <h1>Create an account and start your blogs now!</h1>
+      <div className="min-h-screen flex items-center justify-center bg-gray-100 px-4">
+        <form
+          onSubmit={handleRegister}
+          className="w-full max-w-md bg-white p-6 rounded-xl shadow-lg flex flex-col gap-4"
+        >
+          <h1 className="text-xl font-bold text-center">
+            Create an account
+          </h1>
 
-      <form onSubmit={handleRegister}>
-        <div>
-          <label>Username</label>
-          <input
-            type="text"
-            value={username}
-            onChange={(e) => setUsername(e.target.value)}
-            placeholder=" email"
-          />
-        </div>
+          <p className="text-sm text-gray-600 text-center">
+            Start sharing your blogs today
+          </p>
 
-        <div>
-          <label>Password</label>
-          <input
-            type="password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-          />
-        </div>
+          <div className="flex flex-col gap-1">
+            <label className="text-sm font-medium">Email</label>
+            <input
+              type="text"
+              value={username}
+              onChange={(e) => setUsername(e.target.value)}
+              placeholder="you@example.com"
+              className="border rounded-md p-3 text-base focus:outline-none focus:ring-2 focus:ring-blue-500"
+            />
+          </div>
 
-        <button type="submit">Register</button>
-      </form>
+          <div className="flex flex-col gap-1">
+            <label className="text-sm font-medium">Password</label>
+            <input
+              type="password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              className="border rounded-md p-3 text-base focus:outline-none focus:ring-2 focus:ring-blue-500"
+            />
+          </div>
+
+          <button
+            type="submit"
+            className="bg-blue-600 text-white py-2 rounded-md hover:bg-blue-700 transition font-medium"
+          >
+            Register
+          </button>
+        </form>
+      </div>
     </Page>
   );
 };

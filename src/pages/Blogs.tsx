@@ -1,60 +1,88 @@
 import { useState, useEffect } from "react";
 import Page from "../components/layout/Page";
-import { getBlogs } from "../services/blogService";
+import { getBlogsPaginated } from "../services/blogService";
 
+const PAGE_SIZE = 5;
 
 const Blogs = () => {
+  const [blogs, setBlogs] = useState<any[]>([]);
+  const [page, setPage] = useState(0);
 
-const [ blogs, setBlogs] = useState<any[]>([]);
+  const loadBlogs = async () => {
+    const start = page * PAGE_SIZE;
+    const end = start + PAGE_SIZE - 1;
 
-useEffect(() => {
-  getBlogs().then(setBlogs).catch(console.error);
-}, []);
+    try {
+      const data = await getBlogsPaginated(start, end);
+      setBlogs(data);
+    } catch (error) {
+      console.error(error);
+    }
+  };
 
-    return (
+  useEffect(() => {
+    loadBlogs();
+  }, [page]);
 
-        <Page>
+  return (
+    <Page>
+      <div className="min-h-screen bg-gray-100 px-4 py-6">
+        {/* Intro Section */}
+        <section className="mb-2">
+          <h1 className="text-6xl font-bold">Share your story!</h1>
+          <p className="text-gray-600 mt-2">
+            A simple space to read and write short blog posts from random people.
+          </p>
+          <p className="text-gray-600 font-bold pt-5">
+            Register and start writing.
+          </p>
+        </section>
 
-            <section style ={{ marginBottom: "2rem" }}> 
-            <h1> Share your story! </h1>
+        {/* Blog List */}
+        <section>
+          <h2 className="text-xl font-semibold mb-4">Latest Stories</h2>
 
-            <p>
-                A simple space to read and write short blog posts from random people.
-            </p>
+          <div className="flex flex-col gap-4">
+            {blogs.map((blog) => (
+              <article
+                key={blog.id}
+                className="bg-white p-4 rounded-lg shadow"
+              >
+                <h3 className="text-lg font-semibold">
+                  {blog.title}
+                  <span className="ml-2 text-sm font-normal text-gray-500">
+                    – {blog.author}
+                  </span>
+                </h3>
 
-            <button style={{ marginTop: "1rem" }}>Start writing </button>
-            <button style={{ marginTop: "1rem" }}>Start Reading </button>
-            </section>
+                <p className="text-gray-700 mt-2 line-clamp-3">
+                  {blog.content}
+                </p>
+              </article>
+            ))}
+          </div>
 
-            {/* Blog List */}
+          {/* Pagination */}
+          <div className="flex justify-between mt-6">
+            <button
+              onClick={() => setPage((p) => Math.max(p - 1, 0))}
+              disabled={page === 0}
+              className="px-4 py-2 bg-gray-300 rounded-md disabled:opacity-50"
+            >
+              Previous
+            </button>
 
-            <section>
-                <h2> Latest Stories </h2>
-                {blogs.map((blog)=>(
-                    <article key = {blog.id}
-
-                    style={{
-                        padding: "0rem 0",
-                        borderBottom: "1px solid white"
-                    }}
-                    >
-
-                        <h3>
-                            {blog.title}
-                            <address style = {{ display: "inline", fontWeight: "normal", fontSize: "1rem"}}> 
-                                -{blog.author}
-                            </address>
-                        </h3>
-
-                        <p>{blog.content}</p>
-                        <small > {blog.createdAt} </small>
-                        
-                    </article>
-
-                ))}
-            </section>
-        </Page>
-    )
-}
+            <button
+              onClick={() => setPage((p) => p + 1)}
+              className="px-4 py-2 bg-blue-600 text-white rounded-md"
+            >
+              Next
+            </button>
+          </div>
+        </section>
+      </div>
+    </Page>
+  );
+};
 
 export default Blogs;

@@ -7,9 +7,29 @@ import Blogs from "./pages/Blogs";
 // import EditBlog from "./pages/EditBlog";
 import Logout from "./pages/Logout";
 import Profile from "./pages/Profile";
-import ProtectedRoute from "./components/protectedRoutes";
+import ProtectedRoute from "./components/ProtectedRoutes";
+import { supabase } from "./lib/supabase";
+import { useDispatch } from "react-redux";
+import { useEffect } from "react";
+import { clearUser, setUser } from "./store/authSlice";
 
 const App = () => {
+    const dispatch = useDispatch();
+
+    useEffect(() => {
+      const restoreSession = async () => {
+        const { data } = await supabase.auth.getUser();
+
+        if (data.user) {
+          dispatch(setUser(data.user));
+        } else {
+          dispatch(clearUser());
+        }
+      };
+
+      restoreSession();
+    }, []);
+
   return (
     <BrowserRouter>
       <Routes>
@@ -21,7 +41,6 @@ const App = () => {
         <Route path="/blogs/edit/:id" element={<EditBlog />} /> */}
         <Route path="/logout" element={<Logout/>} />
         <Route path="/profile" element={<Profile />} />
-
 
         <Route
           path="/profile"
@@ -35,6 +54,7 @@ const App = () => {
       </Routes>
     </BrowserRouter>
   );
+
 };
 
 export default App;

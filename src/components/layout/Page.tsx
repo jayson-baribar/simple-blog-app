@@ -1,17 +1,18 @@
-import NavBar  from "../NavBar"
+import NavBar from "../NavBar";
 
-interface PageProps{
-    children: React.ReactNode;
+interface PageProps {
+  children: React.ReactNode;
 }
 
-const Page = ({ children } : PageProps) => {
-    return (
-        <>
-        <NavBar/>
-        <main style = {{ padding: "1rem" }} > 
-        {children} </main>
-        </>
-    )
+const Page = ({ children }: PageProps) => {
+  return (
+    <>
+      <NavBar />
+      <main className="p-4 overflow-x-hidden">
+        {children}
+      </main>
+    </>
+  );
 };
 
 export default Page;

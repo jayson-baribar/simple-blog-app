@@ -15,6 +15,20 @@ const createBlog = async (
     return data;
 };
 
+const getBlogsPaginated = async ( start: number, end: number ) => {
+
+    const { data, error } = await supabase
+    .from("blogs")
+    .select("*")
+    .order("created_at", { ascending: false })
+    .range(start, end)
+
+    if (error) throw error;
+    return data;
+
+}
+
+
 const deleteBlog = async (id: string)=>{
     const { error } = await supabase.from("blogs").delete().eq("id", id);
     if (error) throw error;
@@ -54,5 +68,6 @@ export {
     createBlog,
     deleteBlog,
     updateBlog,
-    getBlogs
+    getBlogs,
+    getBlogsPaginated
 };
