@@ -7,6 +7,7 @@ const PAGE_SIZE = 5;
 const Blogs = () => {
   const [blogs, setBlogs] = useState<any[]>([]);
   const [page, setPage] = useState(0);
+  const [hasNext, setHasNext] = useState(true);
 
   const loadBlogs = async () => {
     const start = page * PAGE_SIZE;
@@ -15,6 +16,9 @@ const Blogs = () => {
     try {
       const data = await getBlogsPaginated(start, end);
       setBlogs(data);
+
+      // If less than PAGE_SIZE, no more pages
+      setHasNext(data.length === PAGE_SIZE);
     } catch (error) {
       console.error(error);
     }
@@ -74,7 +78,8 @@ const Blogs = () => {
 
             <button
               onClick={() => setPage((p) => p + 1)}
-              className="px-4 py-2 bg-blue-600 text-white rounded-md"
+              disabled={!hasNext}
+              className="px-4 py-2 bg-blue-600 text-white rounded-md disabled:opacity-50"
             >
               Next
             </button>

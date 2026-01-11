@@ -13,10 +13,10 @@ const Profile = () => {
   const [email, setEmail] = useState("");
   const [showCreate, setShowCreate] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
-  const [ deleteId, setDeleteId ] = useState<string | null>(null);
-  const [ toast, setToast ] = useState<{message: string; type?: "success" | "error"} | null>(null);
-
+  const [deleteId, setDeleteId] = useState<string | null>(null);
+  const [toast, setToast] = useState<{ message: string; type?: "success" | "error" } | null>(null);
   const [page, setPage] = useState(0);
+  const [hasNext, setHasNext] = useState(true);
 
   const load = async () => {
     const { data } = await supabase.auth.getUser();
@@ -35,6 +35,7 @@ const Profile = () => {
     const end = start + PAGE_SIZE;
 
     setBlogs(myBlogs.slice(start, end));
+    setHasNext(end < myBlogs.length);
   };
 
   useEffect(() => {
@@ -46,7 +47,7 @@ const Profile = () => {
 
     await deleteBlog(deleteId);
     setToast({ message: "Blog deleted", type: "success" });
-    
+
     setDeleteId(null);
     load();
   };
@@ -90,13 +91,12 @@ const Profile = () => {
                   Edit
                 </button>
 
-                <button 
+                <button
                   onClick={() => setDeleteId(blog.id)}
                   className="flex-1 lg:flex-none lg:w-24 bg-red-600 text-white py-1.5 rounded-md"
                 >
                   Delete
                 </button>
-
               </div>
             </article>
           ))}
@@ -114,7 +114,8 @@ const Profile = () => {
 
           <button
             onClick={() => setPage((p) => p + 1)}
-            className="px-4 py-2 bg-blue-600 text-white rounded-md"
+            disabled={!hasNext}
+            className="px-4 py-2 bg-blue-600 text-white rounded-md disabled:opacity-50"
           >
             Next
           </button>
@@ -145,43 +146,44 @@ const Profile = () => {
           </div>
         )}
 
+        {/* Delete Confirmation */}
         {deleteId && (
-  <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 px-4">
-    <div className="bg-white w-full max-w-sm p-4 rounded-lg text-center">
-      <h2 className="text-lg font-bold mb-2">Delete Blog?</h2>
-      <p className="text-sm text-gray-600 mb-4">
-        This action cannot be undone.
-      </p>
+          <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 px-4">
+            <div className="bg-white w-full max-w-sm p-4 rounded-lg text-center">
+              <h2 className="text-lg font-bold mb-2">Delete Blog?</h2>
+              <p className="text-sm text-gray-600 mb-4">
+                This action cannot be undone.
+              </p>
 
-      <div className="flex gap-2">
-        <button
-          onClick={handleDelete}
-          className="flex-1 bg-red-600 text-white py-2 rounded-md"
-        >
-          Delete
-        </button>
+              <div className="flex gap-2">
+                <button
+                  onClick={handleDelete}
+                  className="flex-1 bg-red-600 text-white py-2 rounded-md"
+                >
+                  Delete
+                </button>
 
-        <button
-          onClick={() => setDeleteId(null)}
-          className="flex-1 bg-gray-300 py-2 rounded-md"
-        >
-          Cancel
-        </button>
+                <button
+                  onClick={() => setDeleteId(null)}
+                  className="flex-1 bg-gray-300 py-2 rounded-md"
+                >
+                  Cancel
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+
       </div>
-    </div>
-  </div>
-)}
 
-      </div>
-
-                  {toast && (
+      {toast && (
         <Toast
           message={toast.message}
           type={toast.type}
           onClose={() => setToast(null)}
         />
       )}
-      
+
     </Page>
   );
 };

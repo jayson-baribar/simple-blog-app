@@ -3,7 +3,6 @@ import { useState } from "react";
 import utils from "../utils/validators";
 import { supabase } from "../lib/supabase";
 import Toast  from "../components/Toast";
-import { useNavigate } from "react-router-dom";
 
 const Register = () => {
   const [username, setUsername] = useState("");
@@ -11,7 +10,6 @@ const Register = () => {
   const [ toast, setToast ] = useState<{message: string; type?: 
   "success"| "error" } | null> (null);
 
-  const navigate = useNavigate();
   const usernameMin = 6;
   const usernameMax = 64;
   const passwordMin = 8;

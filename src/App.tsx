@@ -28,7 +28,7 @@ const App = () => {
       };
 
       restoreSession();
-    }, []);
+    }, [dispatch]);
 
   return (
     <BrowserRouter>
